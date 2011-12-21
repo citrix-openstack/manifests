@@ -8,11 +8,10 @@ GIT_USER="${GIT_USER-citrix-openstack}"
 BUILD_HG="${BUILD_HG-http://hg/openstack/$HG_BRANCH/build.hg}"
 
 rootdir="$1"
-build_number="$2"
 
 build_hg="$rootdir/build.hg"
 thisdir=$(dirname $(readlink -f "$0"))
-subdir=$(($build_number / 1000))
+subdir=$(($BUILD_NUMBER / 1000))
 
 env
 
@@ -47,17 +46,17 @@ if [ $result -eq 0 ]
 then
   now=$(date -u "+%Y-%m-%d %H:%M:%SZ")
   mkdir -p "$thisdir/$subdir"
-  cp obj/manifest "$thisdir/$subdir/$build_number.manifest"
-  cat >"$thisdir/$subdir/$build_number.meta" <<EOF
-Build number: $build_number
+  cp obj/manifest "$thisdir/$subdir/$BUILD_NUMBER.manifest"
+  cat >"$thisdir/$subdir/$BUILD_NUMBER.meta" <<EOF
+Build number: $BUILD_NUMBER
 Branch: $GIT_BRANCH
 Date: $now
-Manifest: $subdir/$build_number.manifest
+Manifest: $subdir/$BUILD_NUMBER.manifest
 EOF
   cd "$thisdir"
-  git add "$subdir/$build_number.manifest"
-  git add "$subdir/$build_number.meta"
-  git commit -m "Build $build_number.  Branch: $GIT_BRANCH."
+  git add "$subdir/$BUILD_NUMBER.manifest"
+  git add "$subdir/$BUILD_NUMBER.meta"
+  git commit -m "Build $BUILD_NUMBER.  Branch: $GIT_BRANCH."
   git push
 fi
 
