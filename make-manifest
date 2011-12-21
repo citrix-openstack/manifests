@@ -1,0 +1,57 @@
+#!/bin/bash
+
+set -eux
+
+HG_BRANCH="${HG_BRANCH-trunk}"
+GIT_BRANCH="${GIT_BRANCH-master}"
+GIT_USER="${GIT_USER-citrix-openstack}"
+BUILD_HG="${BUILD_HG-http://hg/openstack/$HG_BRANCH/build.hg}"
+MANIFESTS_GIT="${MANIFESTS_GIT-http://github.com/$GIT_USER/$GIT_BRANCH/manifests}"
+
+rootdir="$1"
+
+build_hg="$rootdir/build.hg"
+manifests_git="$rootdir/manifests"
+
+
+env
+
+export USER="${USER-jenkins}"
+
+mkdir -p "$rootdir"
+
+if [ -e "$manifests_git" ]
+then
+    cd "$manifests_git"
+    git pull
+else
+    cd "$rootdir"
+    git clone "$MANIFESTS_GIT"
+fi
+
+if [ -e "$build_hg" ]
+then
+    cd "$build_hg"
+    hg pull && hg update -C || true
+else
+    cd "$rootdir"
+    hg clone "$BUILD_HG"
+    cd "$build_hg"
+fi
+
+export USE_GIT=true
+export GIT_BRANCH
+export GIT_USER
+set +ex
+BUILD_SUFFIX=${SITE-x} \
+  GLOBAL_CACHE_DIRS="/openstack_build_cache /usr/groups/cache" \
+  make os-vpx-manifest
+result=$?
+set -ex
+
+if [ $result -eq 0 ]
+then
+  echo ''
+fi
+
+exit $result
