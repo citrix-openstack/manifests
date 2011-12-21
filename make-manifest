@@ -19,9 +19,6 @@ export USER="${USER-jenkins}"
 
 mkdir -p "$rootdir"
 
-(cd "$thisdir"
- git pull)
-
 if [ -e "$build_hg" ]
 then
     cd "$build_hg"
