@@ -51,6 +51,8 @@ Date: $now
 Manifest: $subdir/$BUILD_NUMBER.manifest
 EOF
   cd "$thisdir"
+  git checkout master
+  git pull
   git add "$subdir/$BUILD_NUMBER.manifest"
   git add "$subdir/$BUILD_NUMBER.meta"
   git commit -m "Build $BUILD_NUMBER.  Branch: $GIT_BRANCH."
