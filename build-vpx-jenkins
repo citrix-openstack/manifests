@@ -1,0 +1,61 @@
+#!/bin/bash
+
+set -eux
+
+rootdir="$1"
+outputdir="$2"
+
+thisdir=$(basename $(readlink -f "$0"))
+
+env
+
+(cd "$thisdir"
+ git checkout master
+ git pull)
+
+jenkins_build_number="$BUILD_NUMBER"
+official_build_number=$("$thisdir/get_official_build_number")
+subdir=$(($official_build_number / 1000))
+manifest="$thisdir/$subdir/$official_build_number.manifest"
+meta="$thisdir/$subdir/$official_build_number.meta"
+. "$meta"
+# The line above switches BUILD_NUMBER from $jenkins_build_number to
+# $official_build_number, and loads GIT_BRANCH, GIT_USER, amongst others.
+
+"$thisdir/set_test_description" "$JENKINS_URL" "$JOB_NAME" \
+        "$jenkins_build_number" "$BUILD_NUMBER"
+
+export USER="${USER-jenkins}"
+export BUILD_SUFFIX="${SITE-x}"
+export GLOBAL_CACHE_DIRS="/openstack_build_cache /usr/groups/cache"
+export GIT_BRANCH
+export GIT_USER
+set +ex
+"$thisdir/build-vpx" "$rootdir" "$manifest"
+result=$?
+set -ex
+
+output_branch="$outputdir/$GIT_BRANCH"
+output="$output_branch/$BUILD_NUMBER"
+
+sudo mkdir -p "$output"
+sudo chown "$USER" "$output"
+
+echo "Copying output/os-vpx to $output..."
+rsync -a output/os-vpx "$output" || true
+echo "Copying done."
+
+if [ $result -eq 0 ]
+then
+  sudo rm -f "$output_branch/os-vpx-latest"
+  sudo ln -s "$BUILD_NUMBER" "$output_branch/os-vpx-latest"
+  sudo mkdir -p "$outputdir/all"
+  sudo ln -s "../$GIT_BRANCH/$BUILD_NUMBER" "$outputdir/all"
+fi
+
+for file in $(ls *-failed 2>/dev/null || true)
+do
+  echo "ERROR: Component failed to build: ${file/-failed/}."
+done
+
+exit $result

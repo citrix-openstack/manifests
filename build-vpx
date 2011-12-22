@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -eu
+
+HG_BRANCH="${HG_BRANCH-trunk}"
+BUILD_HG="${BUILD_HG-http://hg/openstack/$HG_BRANCH/build.hg}"
+GIT_USER="${GIT_USER-citrix-openstack}"
+GIT_BRANCH="${GIT_BRANCH-everett}"
+
+rootdir="$1"
+manifest="$2"
+
+build_hg="$rootdir/build.hg"
+
+mkdir -p "$rootdir"
+
+if [ -e "$build_hg" ]
+then
+    cd "$build_hg"
+    hg pull && hg update -C || true
+else
+    cd "$rootdir"
+    hg clone "$BUILD_HG"
+    cd "$build_hg"
+fi
+
+export USE_GIT=true
+export GIT_BRANCH
+export GIT_USER
+rm -f *-failed
+make clean
+cp "$manifest" obj/manifest
+make os-vpx-build
