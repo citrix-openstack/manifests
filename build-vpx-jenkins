@@ -26,7 +26,7 @@ meta="$thisdir/$subdir/$official_build_number.meta"
 "$thisdir/set_test_description" "$JENKINS_URL" "$JOB_NAME" \
         "$jenkins_build_number" "$BUILD_NUMBER"
 
-export USER="${USER-jenkins}"
+export USER="jenkins"
 export BUILD_SUFFIX="${SITE-x}"
 export GLOBAL_CACHE_DIRS="/openstack_build_cache /usr/groups/cache"
 export GIT_BRANCH
