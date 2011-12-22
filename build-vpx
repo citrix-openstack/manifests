@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 HG_BRANCH="${HG_BRANCH-trunk}"
 BUILD_HG="${BUILD_HG-http://hg/openstack/$HG_BRANCH/build.hg}"
