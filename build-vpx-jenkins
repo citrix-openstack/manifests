@@ -5,7 +5,7 @@ set -eux
 rootdir="$1"
 outputdir="$2"
 
-thisdir=$(basename $(readlink -f "$0"))
+thisdir=$(dirname $(readlink -f "$0"))
 
 env
 
