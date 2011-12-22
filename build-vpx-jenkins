@@ -6,6 +6,7 @@ rootdir="$1"
 outputdir="$2"
 
 thisdir=$(dirname $(readlink -f "$0"))
+build_hg="$rootdir/build.hg"
 
 env
 
@@ -42,7 +43,7 @@ sudo mkdir -p "$output"
 sudo chown "$USER" "$output"
 
 echo "Copying output/os-vpx to $output..."
-rsync -a output/os-vpx "$output" || true
+rsync -a "$build_hg/output/os-vpx" "$output" || true
 echo "Copying done."
 
 if [ $result -eq 0 ]
