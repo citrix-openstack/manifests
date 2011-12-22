@@ -45,10 +45,11 @@ then
   mkdir -p "$thisdir/$subdir"
   cp obj/manifest "$thisdir/$subdir/$BUILD_NUMBER.manifest"
   cat >"$thisdir/$subdir/$BUILD_NUMBER.meta" <<EOF
-Build number: $BUILD_NUMBER
-Branch: $GIT_BRANCH
-Date: $now
-Manifest: $subdir/$BUILD_NUMBER.manifest
+BUILD_NUMBER="$BUILD_NUMBER"
+GIT_BRANCH="$GIT_BRANCH"
+GIT_USER="$GIT_USER"
+MANIFEST_CREATION_DATE="$now"
+MANIFEST_FILE="$subdir/$BUILD_NUMBER.manifest"
 EOF
   cd "$thisdir"
   git checkout master
