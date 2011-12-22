@@ -29,7 +29,7 @@ def find_upstream_details(params):
 
 def get_bn_from_build(build_url):
     params = eval(get('%(build_url)sapi/python' % locals()))
-    return params['fullDisplayName'].split(' ', 2)[1]
+    return params['fullDisplayName'].split(' ', 2)[1][1:]
 
 
 JENKINS_URL = os.getenv('JENKINS_URL')
