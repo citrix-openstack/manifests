@@ -34,7 +34,6 @@ export GIT_USER
 set +ex
 "$thisdir/build-vpx" "$rootdir" "$manifest"
 result=$?
-set -ex
 
 output_branch="$outputdir/$GIT_BRANCH"
 output="$output_branch/$BUILD_NUMBER"
@@ -43,8 +42,15 @@ sudo mkdir -p "$output"
 sudo chown "$USER" "$output"
 
 echo "Copying output/os-vpx to $output..."
-rsync -a "$build_hg/output/os-vpx" "$output" || true
-echo "Copying done."
+rsync -a "$build_hg/output/os-vpx" "$output"
+rsync_result=$?
+if [ $rsync_result -eq 0 ]
+then
+  echo "Copying done."
+else
+  echo "Copying failed."
+fi 
+set -ex
 
 if [ $result -eq 0 ]
 then
@@ -58,5 +64,4 @@ for file in $(ls *-failed 2>/dev/null || true)
 do
   echo "ERROR: Component failed to build: ${file/-failed/}."
 done
-
-exit $result
+exit $(( $result || $rsync_result ))
